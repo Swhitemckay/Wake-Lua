@@ -1,0 +1,14 @@
+Wake Lua — Proprietary Beta License
+Copyright (c) 2026 Swhitemckay. All rights reserved to the extent permitted by law.
+
+This notice applies to the original Wake Lua software and documentation. The software is proprietary and is not licensed as open source.
+
+The copyright holder grants explicitly invited beta testers a limited, non-exclusive, non-transferable permission to download and run the software solely for private evaluation and feedback. Copies necessary for that evaluation are permitted. Repository access does not grant permission to redistribute, publish, sublicense, sell, modify, reuse the source code, or create derivative works. Any such use requires prior written permission from the copyright holder, except where applicable law provides otherwise. Do not share repository access or distribute beta packages to others.
+
+Monitor drawings, project files, and Lua generated from a user's own designs may be used and shared by that user. This permission does not license the editor's source code.
+
+Third-party libraries and their notices remain governed by their respective licenses. This notice does not restrict rights granted by those licenses. See dist/assets/THIRD_PARTY.txt and the bundled LEGAL notices.
+
+THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTIES OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER IS NOT LIABLE FOR DAMAGES ARISING FROM USE OF THE SOFTWARE.
+
+Requests for additional permission should be directed to the repository owner, Swhitemckay.
