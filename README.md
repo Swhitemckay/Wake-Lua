@@ -1,61 +1,61 @@
-# Wake Lua — Monitor Studio
+# Wake Lua Monitor Studio
 
-A local-first drawing and Lua workbench for Stormworks monitors.
+Draw Stormworks monitor screens, connect touch controls and sensor inputs, and export compact Lua.
 
-## Use
+## Download the app
 
-- **Draw**: hold Shift for square rectangles and 45° lines; Escape cancels a gesture; Shift + arrows nudges 10 pixels; ⌘/Ctrl D duplicates. Center ↔ / ↕ aligns any selected element. All box sizes count occupied pixels, so filled and outlined rectangles keep the same size.
-- **Elements**: pixel tools, shapes, sensor readouts and gauges. Select layers to edit, move, resize, hide, lock or reorder them.
-- **Touch zone (Z)**: drag a rectangle over any part of the monitor. Choose **Boolean OUT 1–32** in the inspector. Its outline appears in the editor; exported Lua draws nothing for the zone. Outputs are momentary (ON while touched). The topmost overlapping control receives the touch.
-- **Test touch**: press controls without moving them. **Run Lua** executes the generated or edited program. Touch uses number inputs 3/4 for X/Y and boolean input 1 for pressed.
-- **HUD tape**: choose direction, tick spacing, size and an input. Wrap at 360 for heading; labels clip at its edges.
-- **Live inputs**: adjust named sensor channels, see Boolean outputs, and view output states beside the monitor preview.
-- **Screens**: use + Screen to add a monitor screen, and the arrows beside Pixel grid to switch screens. Click the screen name for settings, starter layouts and navigation rules. Bind navigation to a button, touch zone, or Boolean input; navigation triggers on a new press.
-- **Projects**: save browser snapshots, download JSON backups, import projects or Lua, and copy share links. Browser storage is local to this device.
+### Windows
 
-## Develop and verify
+Open the [Windows build page](https://github.com/Swhitemckay/Wake-Lua/actions/workflows/desktop.yml). Choose the newest successful **Desktop beta installers** run. Download the Windows item from **Artifacts**.
 
-Requires Node.js 22 or newer and pnpm 10.11.0. Use the checked-in lockfile:
+### Mac
+
+Open the [Mac build page](https://github.com/Swhitemckay/Wake-Lua/actions/workflows/desktop.yml). Choose the newest successful **Desktop beta installers** run. Download the Mac item from **Artifacts**. The workflow creates builds for Apple Silicon and Intel.
+
+If there is no completed run, choose **Run workflow** on the build page and wait for it to finish. These beta installers are unsigned and the workflow downloads may expire. Read [desktop details](desktop/README.md) before installing.
+
+## What it does
+
+1. Draw pixel art, shapes, readouts, gauges and HUD tapes on a monitor canvas.
+2. Add touch zones and map them to momentary Boolean outputs.
+3. Simulate sensor inputs, button presses and generated or custom Lua.
+4. Build multiple screens with touch or signal based navigation.
+5. Export optimized Lua, separate page renderers, project backups and share links.
+
+Projects are stored locally in the browser or desktop app. Read [beta notes](BETA.md) for tested behavior and limitations.
+
+## Get started
+
+### Browser preview
+
+Requires Node.js 22 or newer and pnpm 10.11.0.
 
 ```sh
-pnpm install --frozen-lockfile
-pnpm run check
+pnpm install
 pnpm run preview
 ```
 
-Open http://127.0.0.1:4173. The preview server binds only to your computer.
+Open http://127.0.0.1:4173. Run `pnpm run check` to build the project and run its regression suite.
 
-```sh
-npm run build
-npm test
-```
+### Desktop app
 
-Or run both with `npm run check`. Serve `dist/` using a local static server. Reload the preview after building.
+Install the downloaded `.exe` on Windows or open the `.dmg` on Mac. Projects are saved in the app local storage. Use **Projects → Import** to bring in a browser project backup. Export opens a native Save dialog. See [desktop instructions](desktop/README.md) for local builds and platform notes.
 
-The regression suite executes the actual bundled Fengari worker. It covers all presets, Lua generation, rendering order, touch zone invisibility, channel outputs, overlapping controls, navigation, live values, import validation and execution limits.
+## Using the editor
 
-## Scope
+1. **Draw:** hold Shift for square rectangles and 45 degree lines. Escape cancels a gesture. Shift with arrow keys nudges 10 pixels. Command or Control with D duplicates. Center horizontally or vertically to align selected elements.
+2. **Edit elements:** select layers to move, resize, hide, lock or reorder them. Box sizes count occupied pixels for filled and outlined rectangles.
+3. **Touch zones:** press Z, draw a zone, then select **Boolean OUT 1 to 32** in the inspector. Zones appear in the editor but are invisible in exported Lua. The topmost overlapping control receives touch.
+4. **Test inputs:** adjust named sensor channels and Boolean values beside the monitor preview. Touch uses number inputs 3 and 4 for X and Y, and Boolean input 1 for pressed.
+5. **Create screens:** use **+ Screen**, then click the screen name for settings, starter layouts and navigation rules. Navigation triggers on a new button, zone or Boolean input press.
+6. **Export Lua:** choose **One script** for a compact program, or **Separate page scripts** for a navigation controller and one renderer per page. Each component has a 4,096 character game limit. The editor flags oversized components.
 
-Tests protect known behavior; they cannot guarantee that future browser or game changes will never introduce bugs. Keep project backups. The browser approximates Stormworks fonts, bezels, color and map rendering; confirm exported scripts in game before using them in a vehicle.
+## Releases and builds
 
-## Optimized and separate page exports
+The desktop builds are provided in the workflow runs linked above. To create a local installer, use `pnpm desktop:mac` on macOS or `pnpm desktop:windows` on Windows. Browser source and prebuilt ZIP files are in the repository. To create fresh archives and checksums, run `pnpm run package:beta` after `pnpm run check`. See [BETA.md](BETA.md) for package details.
 
-**Export Lua → One script** minifies the generated drawing or custom script together with its library. Generated code drops unused screen aliases, duplicate color calls, unnecessary page state and empty string concatenation; it merges compatible pixel rectangles and packs dense pixel runs when that produces shorter code. Repeated generation is cached until the drawing changes.
+## Project and license
 
-**Export Lua → Separate page scripts** creates a navigation controller and one renderer per drawing page. Each code block has its own character counter, Copy button and download. Download the ZIP for all scripts and a complete wiring guide. An unused number channel carries page selection; the export suggests one automatically. Preserve the original touch/sensor composite and merge only the controller’s page number into it for the renderer inputs. Read action outputs directly from the controller. Chain the renderer video connections in page order.
+Copyright © 2026 Swhitemckay. All rights reserved. The beta is proprietary and available for evaluation under [LICENSE](LICENSE). Third party notices are included with the app.
 
-This increases the total available code across Lua components; each individual component still has the game’s 4,096-character limit. Oversized components are flagged and downloads are disabled until simplified. Custom hand-written scripts are not split automatically. New projects use a pure **#000000** background.
-
-## Community-informed usability priorities
-
-- Visual authoring and useful live previews respond to [requests for drawing without coding each stroke](https://www.reddit.com/r/Stormworks/comments/tq32ml).
-- Predictable touch release and screen-specific controls respond to [reports of repeated touch actions](https://www.reddit.com/r/Stormworks/comments/16gwexl) and [touch areas remaining active on another screen](https://www.reddit.com/r/Stormworks/comments/rrlbtw).
-- Named inputs, explicit outputs and compact exports address [confusion about touchscreen state and the Lua character limit](https://www.reddit.com/r/Stormworks/comments/1694riu).
-
-The cleanup keeps settings relevant to each element, names sensor inputs next to their channels, and hides Minify for already optimized generated Lua. Legacy outlined rectangles migrate once to preserve their visible dimensions.
-
-## GitHub beta release
-
-Current release: **0.1.0-beta.1**. Run `pnpm run package:beta` after `pnpm run check` to create source and prebuilt ZIP files in `release/`, plus SHA-256 checksums. The source ZIP includes the editor, locked dependencies, tests and GitHub check workflow. The prebuilt ZIP needs only Node.js: run `node scripts/preview.mjs` after extracting it. Both archives omit device projects, hosting identifiers, dependency folders and Git history.
-
-Read [BETA.md](BETA.md) for tested behavior and limitations. When creating a GitHub release, mark it as a prerelease and attach both ZIPs and `SHA256SUMS.txt`. Copyright © 2026 Swhitemckay. All rights reserved. See [LICENSE](LICENSE) for private beta evaluation permissions and restrictions. Third-party notices remain included.
+Community feedback informed priorities around visual drawing, touch behavior and compact Lua exports. See requests about [drawing without scripting each stroke](https://www.reddit.com/r/Stormworks/comments/tq32ml), [repeated touch actions](https://www.reddit.com/r/Stormworks/comments/16gwexl) and [Lua limits and touch state](https://www.reddit.com/r/Stormworks/comments/1694riu).
