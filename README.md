@@ -2,17 +2,19 @@
 
 Draw Stormworks monitor screens, connect touch controls and sensor inputs, and export compact Lua.
 
-## Download the app
+## Download Wake Lua
 
 ### Windows
 
-Open the [Windows build page](https://github.com/Swhitemckay/Wake-Lua/actions/workflows/desktop.yml). Choose the newest successful **Desktop beta installers** run. Download the Windows item from **Artifacts**.
+[Download the Windows installer](https://github.com/Swhitemckay/Wake-Lua/releases/download/v0.1.0-beta.1-desktop/Wake-Lua-Windows.exe)
 
 ### Mac
 
-Open the [Mac build page](https://github.com/Swhitemckay/Wake-Lua/actions/workflows/desktop.yml). Choose the newest successful **Desktop beta installers** run. Download the Mac item from **Artifacts**. The workflow creates builds for Apple Silicon and Intel.
+[Download Mac for Apple Silicon](https://github.com/Swhitemckay/Wake-Lua/releases/download/v0.1.0-beta.1-desktop/Wake-Lua-Mac-AppleSilicon.dmg)
 
-If there is no completed run, choose **Run workflow** on the build page and wait for it to finish. These beta installers are unsigned and the workflow downloads may expire. Read [desktop details](desktop/README.md) before installing.
+[Download Mac for Intel](https://github.com/Swhitemckay/Wake-Lua/releases/download/v0.1.0-beta.1-desktop/Wake-Lua-Mac-Intel.dmg)
+
+These are unsigned beta installers. The downloads are attached to the [desktop beta release](https://github.com/Swhitemckay/Wake-Lua/releases/tag/v0.1.0-beta.1-desktop). Read [desktop details](desktop/README.md) before installing.
 
 ## What it does
 
@@ -39,7 +41,7 @@ Open http://127.0.0.1:4173. Run `pnpm run check` to build the project and run it
 
 ### Desktop app
 
-Install the downloaded `.exe` on Windows or open the `.dmg` on Mac. Projects are saved in the app local storage. Use **Projects → Import** to bring in a browser project backup. Export opens a native Save dialog. See [desktop instructions](desktop/README.md) for local builds and platform notes.
+Install the downloaded Windows file or open the Mac disk image. Projects are saved in the app local storage. Use **Projects → Import** to bring in a browser project backup. Export opens a native Save dialog. See [desktop instructions](desktop/README.md) for local builds and platform notes.
 
 ## Using the editor
 
@@ -52,7 +54,7 @@ Install the downloaded `.exe` on Windows or open the `.dmg` on Mac. Projects are
 
 ## Releases and builds
 
-The desktop builds are provided in the workflow runs linked above. To create a local installer, use `pnpm desktop:mac` on macOS or `pnpm desktop:windows` on Windows. Browser source and prebuilt ZIP files are in the repository. To create fresh archives and checksums, run `pnpm run package:beta` after `pnpm run check`. See [BETA.md](BETA.md) for package details.
+Windows and Mac installers are attached to the desktop beta release linked above. Future installer builds run from the repository Actions page and publish new versioned release assets. To build locally, use `pnpm desktop:mac` on macOS or `pnpm desktop:windows` on Windows. Browser source and prebuilt ZIP files are in the repository. To create fresh archives and checksums, run `pnpm run package:beta` after `pnpm run check`. See [BETA.md](BETA.md) for package details.
 
 ## Project and license
 
