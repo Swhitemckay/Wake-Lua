@@ -36,7 +36,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Wake-Lua-${{ matrix.target }}
-          path: source/wake-lua-0.1.0-beta.1/release/desktop/*
+          path: |
+            source/wake-lua-0.1.0-beta.1/release/desktop/*.dmg
+            source/wake-lua-0.1.0-beta.1/release/desktop/*.exe
           if-no-files-found: error
   publish:
     needs: package
@@ -49,8 +51,11 @@ jobs:
         run: unzip -q wake-lua-0.1.0-beta.1-source.zip -d source
       - name: Read app version
         id: version
-        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
         working-directory: source/wake-lua-0.1.0-beta.1
+        shell: bash
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - name: Download installers
         uses: actions/download-artifact@v4
         with:
@@ -58,6 +63,7 @@ jobs:
           path: release/desktop
           merge-multiple: true
       - name: Prepare clear download names
+        shell: bash
         run: |
           windows_file=$(find release/desktop -maxdepth 1 -name '*.exe' -print -quit)
           arm_file=$(find release/desktop -maxdepth 1 -iname '*arm64*.dmg' -print -quit)
