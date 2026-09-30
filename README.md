@@ -2,6 +2,8 @@
 
 Draw Stormworks monitor screens, connect touch controls and sensor inputs, and export compact Lua.
 
+[![GitHub release downloads](https://img.shields.io/github/downloads/Swhitemckay/Wake-Lua/total?label=downloads)](https://github.com/Swhitemckay/Wake-Lua/releases)
+
 ## Download Wake Lua
 
 ### Windows
