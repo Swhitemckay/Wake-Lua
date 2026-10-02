@@ -50,8 +50,37 @@ jobs:
       - name: Build installer
         working-directory: ${{ steps.project.outputs.directory }}
         run: pnpm run desktop:${{ matrix.target }}
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Verify Mac disk image and app signature
+        if: matrix.target == 'mac'
+        shell: bash
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: |
+          app='release/desktop/mac-universal/Wake Lua.app'
+          dmg=$(find release/desktop -maxdepth 1 -name '*universal.dmg' -print -quit)
+          test -d "$app" && test -n "$dmg"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          archs=$(lipo -archs "$app/Contents/MacOS/Wake Lua")
+          [[ " $archs " == *' x86_64 '* && " $archs " == *' arm64 '* ]]
+          hdiutil verify "$dmg"
+      - name: Install and launch Windows app
+        if: matrix.target == 'windows'
+        shell: pwsh
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: |
+          $installer = (Get-ChildItem release/desktop/*.exe | Select-Object -First 1).FullName
+          $installDir = Join-Path $env:RUNNER_TEMP 'WakeLua'
+          $install = Start-Process -FilePath $installer -ArgumentList '/S', "/D=$installDir" -PassThru -Wait
+          if ($install.ExitCode -ne 0) { throw "Installer exit code: $($install.ExitCode)" }
+          $app = Join-Path $installDir 'Wake Lua.exe'
+          if (!(Test-Path $app)) { throw "Installed app is missing: $app" }
+          $running = Start-Process -FilePath $app -PassThru
+          try {
+            Start-Sleep -Seconds 12
+            $running.Refresh()
+            if ($running.HasExited) { throw "Wake Lua exited with code $($running.ExitCode)" }
+          } finally {
+            if (!$running.HasExited) { Stop-Process -Id $running.Id -Force }
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: Wake-Lua-${{ matrix.target }}
@@ -87,19 +116,13 @@ jobs:
           merge-multiple: true
       - name: Prepare release downloads
         shell: bash
-        env:
-          APP_VERSION: ${{ steps.project.outputs.version }}
         run: |
           windows_file=$(find release/desktop -maxdepth 1 -name '*.exe' -print -quit)
-          arm_file=$(find release/desktop -maxdepth 1 -iname '*arm64*.dmg' -print -quit)
-          intel_file=$(find release/desktop -maxdepth 1 -iname '*x64*.dmg' -print -quit)
-          test -n "$windows_file" && test -n "$arm_file" && test -n "$intel_file"
-          cp "$windows_file" release/desktop/Wake-Lua-Windows.exe
-          cp "$arm_file" release/desktop/Wake-Lua-Mac-AppleSilicon.dmg
-          cp "$intel_file" release/desktop/Wake-Lua-Mac-Intel.dmg
-          cp "wake-lua-${APP_VERSION}-source.zip" release/desktop/
-          cp "wake-lua-${APP_VERSION}-prebuilt.zip" release/desktop/
-          cp SHA256SUMS.txt release/desktop/
+          mac_file=$(find release/desktop -maxdepth 1 -iname '*universal.dmg' -print -quit)
+          test -n "$windows_file" && test -n "$mac_file"
+          mkdir -p release/assets
+          cp "$windows_file" release/assets/Wake-Lua-Windows.exe
+          cp "$mac_file" release/assets/Wake-Lua-Mac.dmg
       - name: Publish versioned downloads
         uses: softprops/action-gh-release@v2
         with:
@@ -108,10 +131,10 @@ jobs:
           body: |-
             Windows and Mac installers for Wake Lua.
 
-            Windows uses x64. Mac downloads are available for Apple Silicon and Intel.
+            Windows uses x64. The universal Mac download supports Apple Silicon and Intel.
 
-            These installers are unsigned. Source and prebuilt browser ZIP files are also attached.
+            These installers are unsigned. On macOS, approve the app in System Settings > Privacy & Security after the first open attempt.
           prerelease: false
           make_latest: true
           overwrite_files: true
-          files: release/desktop/*
+          files: release/assets/*

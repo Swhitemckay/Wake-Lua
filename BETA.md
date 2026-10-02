@@ -1,4 +1,4 @@
-# Wake Lua 0.1.0 — Release Notes
+# Wake Lua 0.1.1 — Release Notes
 
 Visual monitor drawing, live sensor previews and Lua export for Stormworks.
 
@@ -13,6 +13,8 @@ Visual monitor drawing, live sensor previews and Lua export for Stormworks.
 - Image-to-paint preview and Stormworks vehicle XML export.
 
 ## Release verification
+
+The Mac app is now packaged as one universal DMG with a verified ad hoc signature. The Windows installer is installed and launched on a Windows runner before each release is published.
 
 The build and 49 automated regression checks passed. Checks exercise actual Lua execution, the blank starter and curated showcase, all 32 number channels with negative/fractional/zero/large values, touch press/release, overlap rules, navigation, geometry, rotation, project round trips, HUD tapes, character limits and separate page exports.
 

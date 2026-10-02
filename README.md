@@ -12,11 +12,9 @@ Draw Stormworks monitor screens, connect touch controls and sensor inputs, and e
 
 ### macOS
 
-**[Download the latest Mac installer](../../releases/latest)** (`.dmg`; Apple Silicon and Intel builds)
+**[Download the latest Mac installer](../../releases/latest)** (`.dmg`; one universal build for Apple Silicon and Intel)
 
-Open the latest release and choose the installer for your computer from **Assets**. The installers are unsigned. See [desktop details](desktop/README.md) before installing.
-
-The source and prebuilt browser versions are available in the [latest release](../../releases/latest) as well.
+Open the latest release and choose the installer for your computer from **Assets**. The installers are unsigned. On Mac, the first launch may require approval in **System Settings → Privacy & Security**. See [desktop details](desktop/README.md) before installing.
 
 ## What it does
 
@@ -59,7 +57,7 @@ For a hands-on tour, load the single **3×3 Flight Systems Showcase**. It combin
 
 ## Releases and builds
 
-Stable download links are at the top of this page. Published installers and source archives are attached to GitHub releases. To build installers locally, use `pnpm desktop:mac` on macOS or `pnpm desktop:windows` on Windows. See [desktop instructions](desktop/README.md).
+Stable download links are at the top of this page. The latest GitHub release has one Windows installer and one Mac installer. To build installers locally, use `pnpm desktop:mac` on macOS or `pnpm desktop:windows` on Windows. See [desktop instructions](desktop/README.md).
 
 To create browser archives and checksums, run `pnpm run package:beta` after `pnpm run check`. The resulting source and prebuilt ZIP files are in `release/`. See [BETA.md](BETA.md) for package contents and limitations.
 
