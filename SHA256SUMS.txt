@@ -1,2 +1,4 @@
 edefe0ced40c42d68a1d2fe0861b315f6411a89a391f59fb27aa850f47ab06df  wake-lua-0.1.0-beta.1-source.zip
 09c3266cf381898f4b495eccf1365c5eeb3d9053084e1626eaf5b279f70f0600  wake-lua-0.1.0-beta.1-prebuilt.zip
+d83fc7cfbc1a0c82b26a1a9682af0ba216269c6fb2ef114b9a1169cc8b6ab21d  wake-lua-0.1.0-source.zip
+e926f5e286c8a95665a4601d98b0e1a24e8e5b53d35286e707d2b9e0366d2275  wake-lua-0.1.0-prebuilt.zip

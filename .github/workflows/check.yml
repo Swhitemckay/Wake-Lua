@@ -1,0 +1,46 @@
+name: Release checks
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract latest source archive
+        id: project
+        shell: bash
+        run: |
+          source_zip="$(find . -maxdepth 1 -type f -name 'wake-lua-*-source.zip' -print | sed 's|^\./||' | sort -V | tail -n 1)"
+          test -n "$source_zip"
+          version="${source_zip#wake-lua-}"
+          version="${version%-source.zip}"
+          directory="source/wake-lua-${version}"
+          mkdir -p source
+          unzip -q "$source_zip" -d source
+          echo "directory=$directory" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: ${{ steps.project.outputs.directory }}/pnpm-lock.yaml
+      - name: Install dependencies
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: pnpm install --frozen-lockfile
+      - name: Build and test
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: pnpm run check
+      - name: Create verified browser archives
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: pnpm run package:beta
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wake-lua-${{ steps.project.outputs.version }}
+          path: ${{ steps.project.outputs.directory }}/release/

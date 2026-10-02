@@ -1,8 +1,15 @@
 name: Desktop installers
+
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'wake-lua-*-source.zip'
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   package:
     strategy:
@@ -16,8 +23,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Extract project source
-        run: unzip -q wake-lua-0.1.0-beta.1-source.zip -d source
+      - name: Extract latest source archive
+        id: project
+        shell: bash
+        run: |
+          source_zip="$(find . -maxdepth 1 -type f -name 'wake-lua-*-source.zip' -print | sed 's|^\./||' | sort -V | tail -n 1)"
+          test -n "$source_zip"
+          version="${source_zip#wake-lua-}"
+          version="${version%-source.zip}"
+          directory="source/wake-lua-${version}"
+          mkdir -p source
+          unzip -q "$source_zip" -d source
+          echo "directory=$directory" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: pnpm/action-setup@v4
         with:
           version: 10.11.0
@@ -25,21 +43,23 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: source/wake-lua-0.1.0-beta.1/pnpm-lock.yaml
+          cache-dependency-path: ${{ steps.project.outputs.directory }}/pnpm-lock.yaml
       - name: Install dependencies
-        run: cd source/wake-lua-0.1.0-beta.1 && pnpm install --frozen-lockfile
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: pnpm install --frozen-lockfile
       - name: Build installer
-        run: cd source/wake-lua-0.1.0-beta.1 && pnpm run desktop:${{ matrix.target }}
+        working-directory: ${{ steps.project.outputs.directory }}
+        run: pnpm run desktop:${{ matrix.target }}
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - name: Save installer artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: Wake-Lua-${{ matrix.target }}
           path: |
-            source/wake-lua-0.1.0-beta.1/release/desktop/*.dmg
-            source/wake-lua-0.1.0-beta.1/release/desktop/*.exe
+            ${{ steps.project.outputs.directory }}/release/desktop/*.dmg
+            ${{ steps.project.outputs.directory }}/release/desktop/*.exe
           if-no-files-found: error
+
   publish:
     needs: package
     runs-on: ubuntu-latest
@@ -47,23 +67,28 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Extract project source
-        run: unzip -q wake-lua-0.1.0-beta.1-source.zip -d source
-      - name: Read app version
-        id: version
-        working-directory: source/wake-lua-0.1.0-beta.1
+      - name: Extract latest source archive
+        id: project
         shell: bash
         run: |
-          version=$(node -p 'require("./package.json").version')
+          source_zip="$(find . -maxdepth 1 -type f -name 'wake-lua-*-source.zip' -print | sed 's|^\./||' | sort -V | tail -n 1)"
+          test -n "$source_zip"
+          version="${source_zip#wake-lua-}"
+          version="${version%-source.zip}"
+          directory="source/wake-lua-${version}"
+          mkdir -p source
+          unzip -q "$source_zip" -d source
+          echo "directory=$directory" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-      - name: Download installers
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           pattern: Wake-Lua-*
           path: release/desktop
           merge-multiple: true
-      - name: Prepare clear download names
+      - name: Prepare release downloads
         shell: bash
+        env:
+          APP_VERSION: ${{ steps.project.outputs.version }}
         run: |
           windows_file=$(find release/desktop -maxdepth 1 -name '*.exe' -print -quit)
           arm_file=$(find release/desktop -maxdepth 1 -iname '*arm64*.dmg' -print -quit)
@@ -72,21 +97,21 @@ jobs:
           cp "$windows_file" release/desktop/Wake-Lua-Windows.exe
           cp "$arm_file" release/desktop/Wake-Lua-Mac-AppleSilicon.dmg
           cp "$intel_file" release/desktop/Wake-Lua-Mac-Intel.dmg
-      - name: Publish versioned beta downloads
+          cp "wake-lua-${APP_VERSION}-source.zip" release/desktop/
+          cp "wake-lua-${APP_VERSION}-prebuilt.zip" release/desktop/
+          cp SHA256SUMS.txt release/desktop/
+      - name: Publish versioned downloads
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.version }}-desktop
-          name: Wake Lua ${{ steps.version.outputs.version }} Desktop Beta
+          tag_name: v${{ steps.project.outputs.version }}
+          name: Wake Lua ${{ steps.project.outputs.version }}
           body: |-
             Windows and Mac installers for Wake Lua.
 
             Windows uses x64. Mac downloads are available for Apple Silicon and Intel.
 
-            These beta installers are unsigned.
-          prerelease: true
-          make_latest: false
+            These installers are unsigned. Source and prebuilt browser ZIP files are also attached.
+          prerelease: false
+          make_latest: true
           overwrite_files: true
-          files: |
-            release/desktop/Wake-Lua-Windows.exe
-            release/desktop/Wake-Lua-Mac-AppleSilicon.dmg
-            release/desktop/Wake-Lua-Mac-Intel.dmg
+          files: release/desktop/*
