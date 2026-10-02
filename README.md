@@ -16,6 +16,12 @@ Draw Stormworks monitor screens, connect touch controls and sensor inputs, and e
 
 Open the latest release and choose the installer for your computer from **Assets**. The installers are unsigned. On Mac, the first launch may require approval in **System Settings → Privacy & Security**. See [desktop details](desktop/README.md) before installing.
 
+### Security notice
+
+Wake Lua's Mac app is not notarized by Apple. A warning that **Apple cannot check it for malicious software** means Apple has not reviewed this build; that warning alone is not a malware finding. Download only from this repository's [latest release](../../releases/latest). Before publishing, our GitHub Actions workflow verifies the Mac disk image and app signature and installs and launches the Windows app. Those checks do not guarantee that any software is free of malware.
+
+If you trust the download and see the *cannot check* warning, follow [Apple's Open Anyway instructions](https://support.apple.com/en-us/102445). If macOS instead says the app **will damage your computer**, **contains malware**, or **is damaged**, do not override the warning; report the exact message so we can investigate.
+
 ## What it does
 
 - Draw pixel art, shapes, readouts, gauges and HUD tapes on a monitor canvas.
